@@ -4,8 +4,24 @@ import yaml
 import logging
 
 from crawler.services import Crawler, reset_crawler, get_latest_crawl
+from manufacturer.entities import Manufacturer
 from manufacturer.services import install_manufacturers, reset_manufacturers, get_manufacturer_by_slug
-from scrapper.services import reset_scrapper
+from scrapper.services import Scrapper, reset_scrapper
+
+
+def get_manufacturer(slug: str) -> Manufacturer:
+    try:
+        return get_manufacturer_by_slug(slug)
+    except RuntimeError as e:
+        logging.error(str(e))
+        exit(1)
+
+
+def run_option(key: str, choices: dict[str, callable]) -> None:
+    if key not in choices.keys():
+        return logging.warning('Nothing to reset')
+
+    choices[key]()
 
 
 @click.group()
@@ -26,38 +42,28 @@ def install(module: str):
 @cli.command()
 @click.option('--module', required=True, help='Module name to reset')
 def reset(module: str):
-    if module == 'manufacturer':
-        return reset_manufacturers()
-
-    if module == 'crawler':
-        return reset_crawler()
-
-    if module == 'scrapper':
-        return reset_scrapper()
-
-    logging.warning('Nothing to reset')
+    run_option(module, {
+        'manufacturer': reset_manufacturers,
+        'crawler': reset_crawler,
+        'scrapper': reset_scrapper,
+    })
 
 
 @cli.command()
 @click.option('--manufacturer', required=True, help='Manufacturer slug')
 @click.option('--config', required=True, help='Manufacturer Crawl slug')
 def crawl(manufacturer: str, config: str):
-    try:
-        manufacturer = get_manufacturer_by_slug(manufacturer)
-    except RuntimeError as e:
-        logging.error(str(e))
-        exit(1)
-
+    manufacturer = get_manufacturer(manufacturer)
     config = manufacturer.config_by_slug(config)
-    crawler = Crawler(config)
-    asyncio.run(crawler.crawl())
+    asyncio.run(Crawler(config).crawl())
 
 
 @cli.command()
 @click.option('--manufacturer', required=True, help='Manufacturer slug')
 def scrap(manufacturer: str):
-    pass
-    # crawl = get_latest_crawl(manufacturer)
+    manufacturer = get_manufacturer(manufacturer)
+    latest_crawl = get_latest_crawl(manufacturer.slug)
+    Scrapper(manufacturer.slug, manufacturer.scrap_configs).scrap(latest_crawl)
 
 
 if __name__ == '__main__':

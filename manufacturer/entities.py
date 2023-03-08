@@ -50,3 +50,18 @@ class CrawlStep(BaseModel):
     query_params = TextField(default='')
     first = BooleanField()
     last = BooleanField()
+
+
+class ScrapConfig(BaseModel):
+    manufacturer = ForeignKeyField(Manufacturer, backref='scrap_configs')
+    resource_label = CharField()
+
+    def add_property(self, name: str, css_query: str, node_name: str):
+        return ScrapProperty.create(config=self, name=name, css_query=css_query, node_name=node_name)
+
+
+class ScrapProperty(BaseModel):
+    config = ForeignKeyField(ScrapConfig, backref='properties')
+    name = CharField()
+    css_query = CharField()
+    node_name = CharField()

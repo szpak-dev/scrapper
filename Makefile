@@ -9,3 +9,9 @@ cre:
 
 ccr:
 	python cli.py crawl --manufacturer=marttiini --config=default
+
+sre:
+	python cli.py reset --module=scrapper
+
+ssc:
+	python cli.py scrap --manufacturer=marttiini
