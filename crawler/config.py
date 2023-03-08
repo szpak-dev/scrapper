@@ -7,6 +7,7 @@ class CrawlStep(Protocol):
     level: int
     label: str
     css_query: str
+    query_params: str
     first: bool
     last: bool
 

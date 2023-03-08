@@ -12,10 +12,14 @@ class HtmlDocument:
 
 
 class Downloader:
-    def __init__(self, root_url: str):
+    def __init__(self, root_url: str, query_params: str):
         self._root_url = root_url
+        self._query_params = query_params
 
     async def document(self, path: str) -> HtmlDocument:
+        if self._query_params:
+            path += self._query_params
+
         logging.info('> downloading <{}>'.format(path))
 
         url = '{}{}'.format(self._root_url, path)

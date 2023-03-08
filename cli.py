@@ -20,7 +20,7 @@ def install(module: str):
         with open('./manufacturers.yaml') as file:
             return install_manufacturers(yaml.load(file, Loader=yaml.FullLoader))
 
-    logging.info('Nothing to install')
+    logging.warning('Nothing to install')
 
 
 @cli.command()
@@ -35,14 +35,19 @@ def reset(module: str):
     if module == 'scrapper':
         return reset_scrapper()
 
-    logging.info('Nothing to reset')
+    logging.warning('Nothing to reset')
 
 
 @cli.command()
 @click.option('--manufacturer', required=True, help='Manufacturer slug')
 @click.option('--config', required=True, help='Manufacturer Crawl slug')
 def crawl(manufacturer: str, config: str):
-    manufacturer = get_manufacturer_by_slug(manufacturer)
+    try:
+        manufacturer = get_manufacturer_by_slug(manufacturer)
+    except RuntimeError as e:
+        logging.error(str(e))
+        exit(1)
+
     config = manufacturer.config_by_slug(config)
     crawler = Crawler(config)
     asyncio.run(crawler.crawl())

@@ -34,6 +34,7 @@ class CrawlConfig(BaseModel):
                 level=step[0],
                 label=step[1],
                 css_query=step[2],
+                query_params=step[3] if len(step) == 4 else '',
                 first=(index == 1),
                 last=(index == count)
             )
@@ -46,5 +47,6 @@ class CrawlStep(BaseModel):
     level = IntegerField()
     label = CharField()
     css_query = TextField()
+    query_params = TextField(default='')
     first = BooleanField()
     last = BooleanField()

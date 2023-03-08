@@ -66,14 +66,17 @@ class LastStepHandler(StepHandler):
 
 
 class StepHandlerFactory:
-    def __init__(self, downloader: Downloader):
-        self.downloader = downloader
+    def __init__(self, root_url: str, crawl: Crawl):
+        self.root_url = root_url
+        self.crawl = crawl
 
-    def create(self, crawl: Crawl, crawl_step: CrawlStep, parent_resources: list[Resource]) -> StepHandler:
-        if crawl_step.first:
-            return FirstStepHandler(crawl, crawl_step, self.downloader, parent_resources)
+    def create(self, step: CrawlStep, parent_resources: list[Resource]) -> StepHandler:
+        downloader = Downloader(self.root_url, step.query_params)
 
-        if crawl_step.last:
-            return LastStepHandler(crawl, crawl_step, self.downloader, parent_resources)
+        if step.first:
+            return FirstStepHandler(self.crawl, step, downloader, parent_resources)
 
-        return NextStepHandler(crawl, crawl_step, self.downloader, parent_resources)
+        if step.last:
+            return LastStepHandler(self.crawl, step, downloader, parent_resources)
+
+        return NextStepHandler(self.crawl, step, downloader, parent_resources)
