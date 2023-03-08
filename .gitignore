@@ -1,0 +1,6 @@
+*.db
+_downloads
+manufacturers.yaml
+*.pyc
+.idea
+.DS_Store
