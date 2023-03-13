@@ -12,17 +12,24 @@ def reset_crawler():
     logging.info('Crawler tables reset')
 
 
-def get_latest_crawl(manufacturer_slug: str) -> Crawl:
-    return Crawl.get_latest(manufacturer_slug)
+def clear_crawler(target_slug: str):
+    for crawl in Crawl.select().where(Crawl.target_slug == target_slug):
+        crawl.delete_instance(recursive=True)
+
+    logging.info('Crawls made by {} deleted'.format(target_slug))
+
+
+def get_latest_crawl(target_slug: str) -> Crawl:
+    return Crawl.get_latest(target_slug)
 
 
 class Crawler:
     def __init__(self, config: CrawlConfig):
         self.config = config
-        self.manufacturer_slug = str(config.manufacturer)
+        self.target_slug = str(config.target)
 
     async def crawl(self):
-        crawl = Crawl.create(manufacturer_slug=self.manufacturer_slug)
+        crawl = Crawl.create(target_slug=self.target_slug)
         step_handler_factory = StepHandlerFactory(self.config.root_url, crawl)
 
         parent_resources = []

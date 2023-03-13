@@ -14,6 +14,6 @@ class CrawlStep(Protocol):
 
 @dataclass
 class CrawlConfig(Protocol):
-    manufacturer: str
+    target: str
     root_url: str
     steps: list[CrawlStep]

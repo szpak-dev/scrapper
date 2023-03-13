@@ -6,7 +6,7 @@ from _shared.base_model import BaseModel
 
 
 class Crawl(BaseModel):
-    manufacturer_slug = CharField()
+    target_slug = CharField()
     started_at = DateTimeField(default=datetime.datetime.now)
     finished_at = DateTimeField(null=True)
 
@@ -21,12 +21,12 @@ class Crawl(BaseModel):
         self.save()
 
     @classmethod
-    def get_latest(cls, manufacturer_slug: str):
+    def get_latest(cls, target_slug: str):
         return (
             Crawl
             .select()
-            .where(Crawl.manufacturer_slug == manufacturer_slug)
-            .order_by(Crawl.id.desc())
+            .where(cls.target_slug == target_slug)
+            .order_by(cls.id.desc())
             .limit(1)
             .first()
         )
@@ -45,7 +45,7 @@ class Resource(BaseModel):
 
     @property
     def paths(self) -> list[str]:
-        return [link.path for link in self.links]
+        return [link.download_path for link in self.links]
 
 
 class Link(BaseModel):

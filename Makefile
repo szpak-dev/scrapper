@@ -1,17 +1,27 @@
-mre:
-	python cli.py reset --module=manufacturer
+reset:
+	python cli.py reset --module=${m}
 
-min:
-	python cli.py install --module=manufacturer
+reset_all:
+	@make reset m=target
+	@make reset m=crawler
+	@make reset m=scrapper
 
-cre:
-	python cli.py reset --module=crawler
+clear:
+	python cli.py clear --module=${m} --target=${t}
 
-ccr:
-	python cli.py crawl --manufacturer=marttiini --config=default
+install:
+	python cli.py install --module=${m}
 
-sre:
-	python cli.py reset --module=scrapper
+install_all:
+	@make install m=target
+	@make install m=crawler
+	@make install m=scrapper
 
-ssc:
-	python cli.py scrap --manufacturer=marttiini
+crawl:
+	python cli.py crawl --target=${t} --config=default
+
+scrap:
+	python cli.py scrap --target=${t}
+
+download:
+	python cli.py download --target=${t} --media=image

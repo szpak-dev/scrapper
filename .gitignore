@@ -1,6 +1,7 @@
 *.db
 _downloads
-manufacturers.yaml
+targets.yaml
 *.pyc
 .idea
 .DS_Store
+.env
